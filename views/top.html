@@ -17,19 +17,19 @@
 			<h2>{{subtitle}}</h2>
 			<p><iframe style="max-width:100%;" width="560" height="315" src="https://www.youtube.com/embed/{{youtube_id}}?rel=0" frameborder="0" allowfullscreen></iframe></p>
 		</div>
-		<div class="col-sm-4" style="padding-top: 4em;">
+		<div class="col-sm-4" style="padding-top: 6em;">
 			<div class="alert alert-info" role="alert">
 				<h3>合計金額</h3>
 				<div style="text-align:right;">
-					<h3>{{total}}円</h3>
+					<h2>{{total}}円</h2>
 				</div>
-				<h3>目標金額</h3>
 				<div style="text-align:right;">
-					<h3>{{goal}}円</h3>
+
+					<h4>支援者:{{count}}人</h4>
+					<h4>目標金額:{{goal}}円</h4>
 				</div>
-				<h3>残り</h3>
 				<div style="text-align:right;">
-					<h3>{{left}}日</h3>
+					<h3>残り:{{left}}日</h3>
 				</div>
 				<div class="progress">
 					<div class="progress-bar" role="progressbar" style="width: {{rate}}%" aria-valuenow="{{rate}}" aria-valuemin="0" aria-valuemax="100"></div>
