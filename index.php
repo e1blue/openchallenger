@@ -42,7 +42,7 @@ function admin($c) {
             unset($_POST["password_confirm"]);
             config($c=array_merge($c, $_POST));
             set_stripe_total_amount( $c );
-            header("Location: ./?m=top");
+            header("Location: ./?m=admin");
         }
     }
     return render("admin.html", $r);
