@@ -1,0 +1,25 @@
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width = device-width, initial-scale = 1, user-scalable = no">
+<title>{{title}}</title>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<nav class="navbar navbar-inverse">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand">{{title}}</a>
+		</div>
+	</div>
+</nav>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-7">
+			{{thankyou}}
+		</div>
+	</div>
+	<footer>
+		<p class="text-center">
+			<a onclick="alert('特定商取引法に基づく表記\n【販売者名】:{{tk_name}}\n【運営責任者】:{{tk_charge}}\n【住所】:{{tk_address}}\n【商品の販売価格】:{{tk_price}}\n【販売価格以外でお客様に発生する金銭】:{{tk_expense}}\n【お支払い方法】:{{tk_payment}}\n【問合せ先】：{{tk_enquire}}');">特定商取引法に基づく表記</a> | <a href="?m=admin">管理</a>
+		</p>
+	</footer>
+
+</div>
