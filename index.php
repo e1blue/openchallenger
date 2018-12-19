@@ -1,8 +1,9 @@
 <?php
 //特商法キャンセル
 //特商法：メールでご請求いただければ、遅滞なく開示いたします。
-//テストのクレジットカード424242424242242
-
+//概要：テストのクレジットカード424242424242242
+//人数が欲しい
+//OGP
 
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
@@ -14,8 +15,13 @@ function top($c) {
     $c["total"] = number_format($c["total"]);
     $c["goal"] = number_format($c["goal"]);
     $c["url"] = ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI']);
-    $c["left"] = intval(((new DateTime($c["deadline"]))->format('U') - time()) / (60 * 60 * 24));
-    for ($i = 0;$i < 5;$i++) {
+    //0123456789012345678901234
+    //2006-04-05T01:02:03+00:00
+    
+    
+    $c["left"] = intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),
+    substr($c["deadline"] , 0, 2 ), substr($c["deadline"] , 0, 4 )) - time()+60*60*24) / (60 * 60 * 24));
+    for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
     return ($c["left"] > 0) ? render("top.html", $c) : exit("クラウドファウンディングは終了しました。<a href=?m=admin>管理/admin</a>");
@@ -48,7 +54,6 @@ function admin($c) {
     return render("admin.html", $r);
 }
 
-
 function config($c = null) {
     (null === $c ? ($c = file_exists(CONFIG_JSON) ? json_decode(file_get_contents(CONFIG_JSON), true) : init_config()) : file_put_contents(CONFIG_JSON, json_encode($c, JSON_UNESCAPED_UNICODE)));
     do {
@@ -64,12 +69,14 @@ function stripe_charge($apiKey, $token, $amount, $description) {
 
 function set_stripe_total_amount($c) {
     $c["total"] = 0;
+    $c["count"]=0;
     do {
         curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (isset($id) ? "&starting_after=" . $id : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
         $r = json_decode(curl_exec($ch), true);
         foreach ($r["data"] as $l) {
             $c["total"]+= intval($l["amount"]);
             $id = $l["id"];
+            $c["count"]++;
         }
     } while (1 === intval($r["has_more"]));
     config($c);
