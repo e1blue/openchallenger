@@ -1,6 +1,9 @@
 <?php
 //特商法キャンセル
 //特商法：メールでご請求いただければ、遅滞なく開示いたします。
+//テストのクレジットカード424242424242242
+
+
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
@@ -55,14 +58,14 @@ function config($c = null) {
 }
 
 function stripe_charge($apiKey, $token, $amount, $description) {
-    curl_setopt_array($ch = curl_init(), [CURLOPT_URL => "https://api.stripe.com/v1/charges", CURLOPT_USERPWD => $apiKey . ":", CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => http_build_query(array("amount" => intval($amount), "currency" => "jpy", "description" => $description, "source" => $token), '', '&'), ]);
+    curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges", CURLOPT_USERPWD => $apiKey . ":", CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => http_build_query(array("amount" => intval($amount), "currency" => "jpy", "description" => $description, "source" => $token), '', '&') ));
     return (json_decode(curl_exec($ch), true));
 }
 
 function set_stripe_total_amount($c) {
     $c["total"] = 0;
     do {
-        curl_setopt_array($ch = curl_init(), [CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (isset($id) ? "&starting_after=" . $id : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true, ]);
+        curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (isset($id) ? "&starting_after=" . $id : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
         $r = json_decode(curl_exec($ch), true);
         foreach ($r["data"] as $l) {
             $c["total"]+= intval($l["amount"]);
