@@ -11,8 +11,12 @@ function top($c) {
     $c["total"] = number_format($c["total"]);
     $c["goal"] = number_format($c["goal"]);
     $c["url"] = ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI']);
-    $c["left"] = intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),
-    substr($c["deadline"] , 0, 2 ), substr($c["deadline"] , 0, 4 )) - time()+60*60*24) / (60 * 60 * 24));
+    $c["left"] = intval((mktime( substr($c["deadline"] , 11, 2 ),
+    substr($c["deadline"] , 14, 2 ), 
+    substr($c["deadline"] , 17, 2 ), 
+    substr($c["deadline"] , 5, 2 ),
+    substr($c["deadline"] , 8, 2 ), 
+    substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24));
     for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
@@ -97,6 +101,7 @@ function init_config() {
     file_put_contents(CONFIG_JSON, $c = file_get_contents( REMOTE_VIEW."json/config.json"));
     $c=json_decode($c, true);
     $c["deadline"]= date("Y-m-d", time() + 60 * 60 * 24 * 99) . "T23:55:55";
+    config( $c );
     set_stripe_total_amount( $c );
     return json_decode(file_get_contents(CONFIG_JSON), true);
 }
