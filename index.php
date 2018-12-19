@@ -2,10 +2,11 @@
 
 //特商法キャンセル
 //特商法：メールでご請求いただければ、遅滞なく開示いたします。
-//存在しないファイルは外部からとってくる。
 
 define("CONFIG_JSON", "json/config.json");
+define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
+"5.5.9" >phpversion() ? exit("<meta charset=utf-8>PHP5.5.9以降が必要です。need php5.5.9 later, Your php version is ".phpversion()) : null;
 (false !== ($c = config())) && (!isset($_GET["m"])) ? top($c) : $a = (in_array($_GET["m"], array("pay", "admin"), true)) ? $_GET["m"]($c) : top($c);
 
 function top($c) {
@@ -19,6 +20,7 @@ function top($c) {
 }
 
 function pay($c) {
+
     !($_POST["stripeToken"]) ? exit("ERROR") : "";
     $r = stripe_charge($c["stripe_secret_key"], h($_POST["stripeToken"]), intval($_GET["p"]), $c["title"]);
     ("succeeded" !== $r["status"]) ? exit("credit card error:" . $r["error"]["message"]) : render("thankyou.html", $c );
@@ -74,13 +76,17 @@ function set_stripe_total_amount($c){
 }
 
 function render($f, $r) {
-    $buff = (file_exists("views/" . $f)) ? file_get_contents("views/" . $f) : file_get_contents("");
+    @mkdir("views");
+    $b = (file_exists( $t="views/".$f)) ?
+    file_get_contents( $t ) : 
+    file_get_contents( REMOTE_VIEW.$t );//.chr(&&0);
+   ( 1 > intval(@filesize( $t )) && 1024 < strlen( $b )) ? file_put_contents( $t , $b ) : null;
     do {
-        $buff =
+        $b =
         str_replace("{{" . key($r) . "}}",
-        (in_array( key($r), array("description", "thankyou")) ? current($r) : h(current($r))), $buff);
+        (in_array( key($r), array("description", "thankyou")) ? current($r) : h(current($r))), $b );
     } while (false !== next($r));
-    echo $buff;
+    echo $b;
     return true;
 }
 
@@ -95,3 +101,4 @@ function init_config() {
     set_stripe_total_amount( json_decode( $c , true ) );
     return json_decode( file_get_contents( CONFIG_JSON )  , true );
 }
+
