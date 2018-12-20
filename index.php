@@ -11,12 +11,7 @@ function top($c) {
     $c["total"] = number_format($c["total"]);
     $c["goal"] = number_format($c["goal"]);
     $c["url"] = ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI']);
-    $c["left"] = intval((mktime( substr($c["deadline"] , 11, 2 ),
-    substr($c["deadline"] , 14, 2 ), 
-    substr($c["deadline"] , 17, 2 ), 
-    substr($c["deadline"] , 5, 2 ),
-    substr($c["deadline"] , 8, 2 ), 
-    substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24));
+    $c["left"] = intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),substr($c["deadline"] , 8, 2 ), substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24));
     for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
@@ -41,9 +36,7 @@ function admin($c) {
             if (0 < strlen($_POST["password"])) {
                 $_SESSION["expired"] = ($_POST["password"] == $_POST["password_confirm"]) ? ($c["password"] = md5($_POST["password"])) & 0 : exit("your password can not be confirmed.");
             }
-            unset($_POST["login_password"]);
-            unset($_POST["password"]);
-            unset($_POST["password_confirm"]);
+            foreach( array("login_password", "password","password_confirm" ) as $l )unset( $_POST[$l] );
             config($c=array_merge($c, $_POST));
             set_stripe_total_amount( $c );
             header("Location: ./?m=admin");
