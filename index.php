@@ -1,24 +1,19 @@
 <?php
-//ヘドロのようなコードだろ？ 自己満足だよ。
+//ヘドロのようなコードだろ？ 
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
 (false !== ($c = config())) && (!isset($_GET["m"])) ? top($c) : $a = (in_array($_GET["m"], array("pay", "admin"), true)) ? $_GET["m"]($c) : top($c);
 
 function top($c) {
-    $c["rate"] = ($c["total"] * 100) / intval($c["goal"]);
-    $c["total"] = number_format($c["total"]);
-    $c["goal"] = number_format($c["goal"]);
-    $c["url"] = ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI']);
-    $c["left"] = intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),substr($c["deadline"] , 8, 2 ), substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24));
     for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
-    return ($c["left"] > 0) ? render("top.html", $c) : render("blank.html", array_merge( $c , array("contents"=>"<h1>クラウドファウンディングは終了しました</h1>")));
+    return ( 0 < $c["left"]=intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),substr($c["deadline"] , 8, 2 ), substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24)) ) ? render("top.html", array_merge( $c , array( "rate" => ($c["total"] * 100) / intval($c["goal"]) , "total"=> number_format($c["total"]) , "goal" => number_format($c["goal"]) ,"url" => ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI'])))) : render("blank.html", array_merge( $c , array_merge( $c , array("contents"=>"<h1>クラウドファウンディングは終了しました</h1>"))));
 }
 
 function pay($c) {
-    $r=($_POST["stripeToken"]) ?  stripe_charge($c["stripe_secret_key"], h($_POST["stripeToken"]), intval($_GET["p"]), $c["title"]) : exit("ERROR");
+    $r=isset($_POST["stripeToken"]) ?  stripe_charge($c["stripe_secret_key"], h($_POST["stripeToken"]), intval($_GET["p"]), $c["title"]) : exit("ERROR");
     ("succeeded" !== $r["status"]) ? exit("credit card error:" . $r["error"]["message"]) : render("blank.html", array_merge( $c , array("contents"=>$c["thankyou"])));
     set_stripe_total_amount(config());
 }
