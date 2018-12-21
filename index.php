@@ -3,8 +3,6 @@
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
-//die( var_dump(password_verify("fukuyuki" ,password_hash("fukuyuki",PASSWORD_DEFAULT))) );
-
 (false !== ($c = config())) && (!isset($_GET["m"])) ? top($c) : $a = (in_array($_GET["m"], array("pay", "admin"), true)) ? $_GET["m"]($c) : top($c);
 
 function top($c) {
