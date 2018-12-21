@@ -73,8 +73,7 @@ function render($f, $r) {
     do {
         $b = str_replace("{{" . key($r) . "}}", (in_array(key($r), array("contents","description", "thankyou")) ? current($r) : h(current($r))), $b);
     } while (false !== next($r));
-    echo $b;
-    return true;
+    return printf( $b );
 }
 
 function h($s) {
