@@ -14,13 +14,13 @@ function top($c) {
     for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
-    return ($c["left"] > 0) ? render("top.html", $c) : exit("クラウドファウンディングは終了しました。<a href=?m=admin>管理/admin</a>");
+    return ($c["left"] > 0) ? render("top.html", $c) : render("blank.html", array("contents"=>"<h1>クラウドファウンディングは終了しました。</h1>"));
 }
 
 function pay($c) {
     !($_POST["stripeToken"]) ? exit("ERROR") : "";
     $r = stripe_charge($c["stripe_secret_key"], h($_POST["stripeToken"]), intval($_GET["p"]), $c["title"]);
-    ("succeeded" !== $r["status"]) ? exit("credit card error:" . $r["error"]["message"]) : render("thankyou.html", $c);
+    ("succeeded" !== $r["status"]) ? exit("credit card error:" . $r["error"]["message"]) : render("blank.html", array_merge( $c , array("contents"=>$c["thankyou"])));
     set_stripe_total_amount(config());
 }
 
@@ -32,7 +32,7 @@ function admin($c) {
         $r = array_merge($r, array("display_admin_form" => "block", "display_login_form" => "none"));
         if (0 < count($_POST)) {
             if (0 < strlen($_POST["password"])) {
-                $_SESSION["expired"] = ($_POST["password"] == $_POST["password_confirm"]) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit("your password can not be confirmed.");
+                $_SESSION["expired"] = (0===strcmp($_POST["password"] , $_POST["password_confirm"])) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit( intval(render("blank.html", array("contents"=>"<h2>パスワードが一致しません。</h2>"))));;
             }
             foreach( array("login_password", "password","password_confirm" ) as $l )unset( $_POST[$l] );
             config($c=array_merge($c, $_POST));
@@ -61,9 +61,7 @@ function set_stripe_total_amount($c) {
     do {
         curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (1<strlen("".$c["id"]) ? "&starting_after=" . $c["id"] : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
         $r = json_decode(curl_exec($ch), true);
-        foreach ($r["data"] as $l) {
-            $c = array_merge( $c , array( "total"=>$c["total"]+intval($l["amount"]) , "count"=>$c["count"]+1 , "id"=>$l["id"]));;
-        }
+        foreach ($r["data"] as $l) $c = array_merge( $c , array( "total"=>$c["total"]+intval($l["amount"]) , "count"=>$c["count"]+1 , "id"=>$l["id"]));;
     } while (1 === intval($r["has_more"]));
     config($c);
 }
@@ -73,7 +71,7 @@ function render($f, $r) {
     $b = (file_exists($t = "views/" . $f)) ? file_get_contents($t) : file_get_contents(REMOTE_VIEW . $t);
     (1 > intval(@filesize($t)) && 1024 < strlen($b)) ? file_put_contents($t, $b) : null;
     do {
-        $b = str_replace("{{" . key($r) . "}}", (in_array(key($r), array("description", "thankyou")) ? current($r) : h(current($r))), $b);
+        $b = str_replace("{{" . key($r) . "}}", (in_array(key($r), array("contents","description", "thankyou")) ? current($r) : h(current($r))), $b);
     } while (false !== next($r));
     echo $b;
     return true;
@@ -86,7 +84,7 @@ function h($s) {
 function init_config() {
     @mkdir("json");
     @chmod("json", 705);
-    file_put_contents(CONFIG_JSON, $c = file_get_contents( REMOTE_VIEW."json/config.json"));
+    file_put_contents( CONFIG_JSON, $c = file_get_contents( REMOTE_VIEW."json/config.json"));
     $c=json_decode($c, true);
     $c["deadline"]= date("Y-m-d", time() + 60 * 60 * 24 * 99) . "T23:55:55";
     $c["password"]= password_hash("fukuyuki",PASSWORD_DEFAULT);
@@ -94,3 +92,4 @@ function init_config() {
     set_stripe_total_amount( $c );
     return json_decode(file_get_contents(CONFIG_JSON), true);
 }
+
