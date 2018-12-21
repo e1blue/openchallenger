@@ -33,7 +33,7 @@ function admin($c) {
         $r = array_merge($r, array("display_admin_form" => "block", "display_login_form" => "none"));
         if (0 < count($_POST)) {
             if (0 < strlen($_POST["password"])) {
-                $_SESSION["expired"] = (0===strcmp($_POST["password"] , $_POST["password_confirm"])) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit( intval(render("blank.html", array("contents"=>"<h2>パスワードが一致しません。</h2>"))));;
+                $_SESSION["expired"] = (0===strcmp($_POST["password"] , $_POST["password_confirm"])) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit( intval(render("blank.html", array_merge( $c , array("contents"=>"<h2>パスワードが一致しません。</h2>")))));;
             }
             foreach( array("login_password", "password","password_confirm" ) as $l )unset( $_POST[$l] );
             config($c=array_merge($c, $_POST));
