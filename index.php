@@ -1,6 +1,5 @@
 <?php
 //ヘドロのようなコードだろ？ 自己満足だよ。
-
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
@@ -19,8 +18,7 @@ function top($c) {
 }
 
 function pay($c) {
-    !($_POST["stripeToken"]) ? exit("ERROR") : "";
-    $r = stripe_charge($c["stripe_secret_key"], h($_POST["stripeToken"]), intval($_GET["p"]), $c["title"]);
+    $r=($_POST["stripeToken"]) ?  stripe_charge($c["stripe_secret_key"], h($_POST["stripeToken"]), intval($_GET["p"]), $c["title"]) : exit("ERROR");
     ("succeeded" !== $r["status"]) ? exit("credit card error:" . $r["error"]["message"]) : render("blank.html", array_merge( $c , array("contents"=>$c["thankyou"])));
     set_stripe_total_amount(config());
 }
