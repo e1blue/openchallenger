@@ -1,6 +1,5 @@
 <?php
 //ヘドロのようなコードだろ？
-
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
@@ -67,7 +66,7 @@ function set_stripe_total_amount($c) {
         foreach ($r["data"] as $l) {
             $c["total"]+= intval($l["amount"]);
             $id = $l["id"];
-            $c["count"]++;//このあたりに多くの不具合がある。
+            $c["count"]++;
         }
     } while (1 === intval($r["has_more"]));
     config($c);
