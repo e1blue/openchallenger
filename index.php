@@ -1,5 +1,6 @@
 <?php
-//ヘドロのようなコードだろ？
+//ヘドロのようなコードだろ？ 自己満足だよ。
+
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
@@ -14,7 +15,7 @@ function top($c) {
     for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
-    return ($c["left"] > 0) ? render("top.html", $c) : render("blank.html", array("contents"=>"<h1>クラウドファウンディングは終了しました。</h1>"));
+    return ($c["left"] > 0) ? render("top.html", $c) : render("blank.html", array_merge( $c , array("contents"=>"<h1>クラウドファウンディングは終了しました</h1>")));
 }
 
 function pay($c) {
@@ -73,7 +74,7 @@ function render($f, $r) {
     do {
         $b = str_replace("{{" . key($r) . "}}", (in_array(key($r), array("contents","description", "thankyou")) ? current($r) : h(current($r))), $b);
     } while (false !== next($r));
-    return printf( $b );
+    echo $b;
 }
 
 function h($s) {
@@ -91,4 +92,3 @@ function init_config() {
     set_stripe_total_amount( $c );
     return json_decode(file_get_contents(CONFIG_JSON), true);
 }
-
