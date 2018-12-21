@@ -27,13 +27,15 @@ function pay($c) {
 function admin($c) {
     session_start();
     $r = array_merge(array("display_admin_form" => "none", "display_login_form" => "block"), $c);
-    (isset($_POST["login_password"])) ? ((0 === strcmp(md5($_POST["login_password"]), $c["password"])) ? $_SESSION["expired"] = time() + 60 * 60 * 8 : printf("<h2>password error!</h2>")) : null;
+    (isset($_POST["login_password"])) ? 
+    ((0 === strcmp(password_hash($_POST["login_password"],PASSWORD_DEFAULT), $c["password"]) ?
+    $_SESSION["expired"] = time() + 60 * 60 * 8 : printf("<h2>password error!</h2>"))) : null;
     if (time() < intval($_SESSION["expired"])) {
         $r = array_merge($r, array("display_admin_form" => "block", "display_login_form" => "none"));
         if (0 === count($_POST)) {
         } else {
             if (0 < strlen($_POST["password"])) {
-                $_SESSION["expired"] = ($_POST["password"] == $_POST["password_confirm"]) ? ($c["password"] = md5($_POST["password"])) & 0 : exit("your password can not be confirmed.");
+                $_SESSION["expired"] = ($_POST["password"] == $_POST["password_confirm"]) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit("your password can not be confirmed.");
             }
             foreach( array("login_password", "password","password_confirm" ) as $l )unset( $_POST[$l] );
             config($c=array_merge($c, $_POST));
