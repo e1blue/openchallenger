@@ -57,14 +57,12 @@ function stripe_charge($apiKey, $token, $amount, $description) {
 }
 
 function set_stripe_total_amount($c) {
-    $c["total"] = $c["count"]= 0;
+    $c["total"] = $c["count"]= $c["id"]=0;
     do {
-        curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (isset($id) ? "&starting_after=" . $id : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
+        curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (1<strlen("".$c["id"]) ? "&starting_after=" . $c["id"] : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
         $r = json_decode(curl_exec($ch), true);
         foreach ($r["data"] as $l) {
-            $c["total"]+= intval($l["amount"]);
-            $id = $l["id"];
-            $c["count"]++;
+            $c = array_merge( $c , array( "total"=>$c["total"]+intval($l["amount"]) , "count"=>$c["count"]+1 , "id"=>$l["id"]));;
         }
     } while (1 === intval($r["has_more"]));
     config($c);
