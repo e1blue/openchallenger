@@ -89,6 +89,7 @@ function init_config() {
     file_put_contents(CONFIG_JSON, $c = file_get_contents( REMOTE_VIEW."json/config.json"));
     $c=json_decode($c, true);
     $c["deadline"]= date("Y-m-d", time() + 60 * 60 * 24 * 99) . "T23:55:55";
+    $c["password"]= password_hash("fukuyuki",PASSWORD_DEFAULT);
     config( $c );
     set_stripe_total_amount( $c );
     return json_decode(file_get_contents(CONFIG_JSON), true);
