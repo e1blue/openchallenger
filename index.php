@@ -27,13 +27,10 @@ function pay($c) {
 function admin($c) {
     session_start();
     $r = array_merge(array("display_admin_form" => "none", "display_login_form" => "block"), $c);
-    (isset($_POST["login_password"])) ? 
-    ((0 === strcmp(password_hash($_POST["login_password"],PASSWORD_DEFAULT), $c["password"]) ?
-    $_SESSION["expired"] = time() + 60 * 60 * 8 : printf("<h2>password error!</h2>"))) : null;
+    (isset($_POST["login_password"])) ? ((0 === strcmp(password_hash($_POST["login_password"],PASSWORD_DEFAULT), $c["password"]) ? $_SESSION["expired"] = time() + 60 * 60 * 8 : printf("<h2>password error!</h2>"))) : null;
     if (time() < intval($_SESSION["expired"])) {
         $r = array_merge($r, array("display_admin_form" => "block", "display_login_form" => "none"));
-        if (0 === count($_POST)) {
-        } else {
+        if (0 < count($_POST)) {
             if (0 < strlen($_POST["password"])) {
                 $_SESSION["expired"] = ($_POST["password"] == $_POST["password_confirm"]) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit("your password can not be confirmed.");
             }
@@ -60,8 +57,7 @@ function stripe_charge($apiKey, $token, $amount, $description) {
 }
 
 function set_stripe_total_amount($c) {
-    $c["total"] = 0;
-    $c["count"]=0;
+    $c["total"] = $c["count"]= 0;
     do {
         curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (isset($id) ? "&starting_after=" . $id : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
         $r = json_decode(curl_exec($ch), true);
