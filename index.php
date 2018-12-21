@@ -3,6 +3,8 @@
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
+//die( var_dump(password_verify("fukuyuki" ,password_hash("fukuyuki",PASSWORD_DEFAULT))) );
+
 (false !== ($c = config())) && (!isset($_GET["m"])) ? top($c) : $a = (in_array($_GET["m"], array("pay", "admin"), true)) ? $_GET["m"]($c) : top($c);
 
 function top($c) {
@@ -27,7 +29,7 @@ function pay($c) {
 function admin($c) {
     session_start();
     $r = array_merge(array("display_admin_form" => "none", "display_login_form" => "block"), $c);
-    (isset($_POST["login_password"])) ? ((0 === strcmp(password_hash($_POST["login_password"],PASSWORD_DEFAULT), $c["password"]) ? $_SESSION["expired"] = time() + 60 * 60 * 8 : printf("<h2>password error!</h2>"))) : null;
+    (isset($_POST["login_password"])) ? (( password_verify($_POST["login_password"], $c["password"]) ? $_SESSION["expired"] = time() + 60 * 60 * 8 : printf("<h2>password error!</h2>"))) : null;
     if (time() < intval($_SESSION["expired"])) {
         $r = array_merge($r, array("display_admin_form" => "block", "display_login_form" => "none"));
         if (0 < count($_POST)) {
