@@ -1,7 +1,8 @@
 <?php
 //ヘドロのようなコードだろ？ 
-//在庫設定が欲しい
+//在庫設定が欲しい//total_amout:"id"=>"description":"Open Challenger",でプランを検索
 //[プロジェクト完了後に表示される文言:]$c["finished"]の実装。
+
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
@@ -55,6 +56,7 @@ function set_stripe_total_amount($c) {
     do {
         curl_setopt_array($ch = curl_init(), array( CURLOPT_URL => "https://api.stripe.com/v1/charges?limit=100" . (1<strlen("".$c["id"]) ? "&starting_after=" . $c["id"] : ""), CURLOPT_USERPWD => $c["stripe_secret_key"] . ":", CURLOPT_RETURNTRANSFER => true) );
         $r = json_decode(curl_exec($ch), true);
+        file_put_contents( "stripe_log".time().".txt" , json_encode( $r ));
         foreach ($r["data"] as $l) $c = array_merge( $c , array( "total"=>$c["total"]+intval($l["amount"]) , "count"=>$c["count"]+1 , "id"=>$l["id"]));;
     } while (1 === intval($r["has_more"]));
     config($c);
