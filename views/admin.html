@@ -22,11 +22,9 @@
                         <input type=submit class="btn btn-primary">
                     </form>
                 </div>
-
                 <div style="display:{{display_admin_form}};">
                     <h3>Open Challengerの管理画面</h3>
                     <a href="./?m=top">トップページ</a>
-
                     <form action="?m=admin" method=post>
                         <label>タイトル</label>
                         <input type="text" class="form-control" name="title" value="{{title}}" maxlength=32>
@@ -94,7 +92,7 @@
                         <textarea class="form-control" name="thankyou" rows=10>{{thankyou}}</textarea>
                         <hr>
                         <label>プロジェクト完了後に表示される文言:</label>
-                        <textarea class="form-control" name="finished" rows=10>{{thankyou}}</textarea>
+                        <textarea class="form-control" name="finished" rows=10>{{finished}}</textarea>
                         <hr>
                         <h3>特商法関係:</h3>
                         <label>販売者:</label>

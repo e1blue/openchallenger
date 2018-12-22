@@ -1,5 +1,7 @@
 <?php
 //ヘドロのようなコードだろ？ 
+//在庫設定が欲しい
+//[プロジェクト完了後に表示される文言:]$c["finished"]の実装。
 define("CONFIG_JSON", "json/config.json");
 define("REMOTE_VIEW", "https://raw.githubusercontent.com/openchallenger/openchallenger/master/");
 
@@ -9,7 +11,7 @@ function top($c) {
     for ($i = 0; $i < 5; $i++) {
         $c["display_plan_" . $i] = (100 < $p = intval($c["plan_" . $i . "_price"])) ? "block;" . sprintf("", $c["plan_" . $i . "_price_formatted"] = number_format($p)) : "none";
     }
-    return ( 0 < $c["left"]=intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),substr($c["deadline"] , 8, 2 ), substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24)) ) ? render("top.html", array_merge( $c , array( "rate" => ($c["total"] * 100) / intval($c["goal"]) , "total"=> number_format($c["total"]) , "goal" => number_format($c["goal"]) ,"url" => ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI'])))) : render("blank.html", array_merge( $c , array_merge( $c , array("contents"=>"<h1>クラウドファウンディングは終了しました</h1>"))));
+    return ( 0 < $c["left"]=intval((mktime( substr($c["deadline"] , 11, 2 ), substr($c["deadline"] , 14, 2 ), substr($c["deadline"] , 17, 2 ), substr($c["deadline"] , 5, 2 ),substr($c["deadline"] , 8, 2 ), substr($c["deadline"] , 0, 4 )) - time()) / (60 * 60 * 24)) ) ? render("top.html", array_merge( $c , array( "rate" => ($c["total"] * 100) / intval($c["goal"]) , "total"=> number_format($c["total"]) , "goal" => number_format($c["goal"]) ,"url" => ((443 !== intval($_SERVER['SERVER_PORT'])) ? "http://" : "https://") . $_SERVER['HTTP_HOST'] . "/" . ($_SERVER['REQUEST_URI'])))) : render("blank.html", array_merge( $c , array_merge( $c , array("contents"=>$c["finished"]))));
 }
 
 function pay($c) {
@@ -25,9 +27,7 @@ function admin($c) {
     if (time() < intval($_SESSION["expired"])) {
         $r = array_merge($r, array("display_admin_form" => "block", "display_login_form" => "none"));
         if (0 < count($_POST)) {
-            if (0 < strlen($_POST["password"])) {
-                $_SESSION["expired"] = (0===strcmp($_POST["password"] , $_POST["password_confirm"])) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit( intval(render("blank.html", array_merge( $c , array("contents"=>"<h2>パスワードが一致しません。</h2>")))));;
-            }
+            (0 < strlen($_POST["password"])) ? $_SESSION["expired"] = (0===strcmp($_POST["password"] , $_POST["password_confirm"])) ? ($c["password"] = password_hash($_POST["password"],PASSWORD_DEFAULT)) & 0 : exit( intval(render("blank.html", array_merge( $c , array("contents"=>"<h2>パスワードが一致しません。</h2>"))))) : null ;
             foreach( array("login_password", "password","password_confirm" ) as $l )unset( $_POST[$l] );
             config($c=array_merge($c, $_POST));
             set_stripe_total_amount( $c );
